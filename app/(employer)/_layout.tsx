@@ -8,8 +8,8 @@ import { Colors } from "@/constants/theme";
 import { mockEmployer, mockEmployerNotifications } from "@/data/mock-employer";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
-    NavigationVisibilityProvider,
-    useNavigationVisibility,
+  NavigationVisibilityProvider,
+  useNavigationVisibility,
 } from "@/hooks/use-navigation-visibility";
 import * as NavigationBar from "expo-navigation-bar";
 import { Briefcase, Home, MessageSquareText } from "lucide-react-native";
@@ -23,19 +23,17 @@ function TabLayoutContent() {
     mockEmployerNotifications.filter((n) => !n.isRead).length,
   );
 
-  // Pages where top header and bottom tabs should be visible
-  const mainPages = [
-    "/",
-    "/index",
-    "/jobs",
-    "/messages",
-    "/notifications",
-    "/settings",
-  ];
-  const isMainPage = mainPages.includes(pathname);
+  // Main tab pages where navigation should always be visible
+  const mainTabPages = ["/", "/index", "/jobs", "/messages", "/settings"];
 
-  // Show navigation only on main pages and when context allows it
-  const shouldShowNavigation = isMainPage && isNavigationVisible;
+  // Check if current page is a main tab page
+  const isMainTabPage = mainTabPages.some(
+    (page) => pathname === page || pathname.endsWith(page),
+  );
+
+  // Show navigation only on main tab pages
+  // For main pages, also check context (for chat screens etc.)
+  const shouldShowNavigation = isMainTabPage && isNavigationVisible;
 
   useEffect(() => {
     if (Platform.OS === "android") {

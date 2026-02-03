@@ -63,7 +63,11 @@ export default function ProfileScreen() {
     if (activeScreen !== "main") {
       setActiveScreen("main");
     } else {
-      router.back();
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/(jobSeeker)");
+      }
     }
   };
 

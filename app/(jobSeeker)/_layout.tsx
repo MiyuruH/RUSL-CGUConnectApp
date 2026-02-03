@@ -24,26 +24,19 @@ function TabLayoutContent() {
   );
 
   // Pages where top header and bottom tabs should be visible
-  const mainPages = [
-    "/",
-    "/index",
-    "/jobs",
-    "/messages",
-    "/notifications",
-    "/profile",
-  ];
+  const mainPages = ["/", "/index", "/jobs", "/messages", "/profile"];
   const isMainPage = mainPages.includes(pathname);
 
-  // Hide navigation on detail/sub pages
-  const isDetailPage =
-    pathname.includes("job-details") ||
-    pathname.includes("all-categories") ||
-    pathname.includes("all-companies") ||
-    pathname.includes("category-jobs");
+  // Hide navigation on job-details and notifications page (notifications has its own header)
+  const isJobDetailsPage = pathname.includes("job-details");
+  const isNotificationsPage = pathname.includes("notifications");
 
   // Show navigation only on main pages and when context allows it
   const shouldShowNavigation =
-    isMainPage && !isDetailPage && isNavigationVisible;
+    isMainPage &&
+    !isJobDetailsPage &&
+    !isNotificationsPage &&
+    isNavigationVisible;
 
   useEffect(() => {
     if (Platform.OS === "android") {
@@ -122,27 +115,6 @@ function TabLayoutContent() {
         />
         <Tabs.Screen
           name="profile"
-          options={{
-            href: null,
-            headerShown: false,
-          }}
-        />
-        <Tabs.Screen
-          name="all-categories"
-          options={{
-            href: null,
-            headerShown: false,
-          }}
-        />
-        <Tabs.Screen
-          name="all-companies"
-          options={{
-            href: null,
-            headerShown: false,
-          }}
-        />
-        <Tabs.Screen
-          name="category-jobs"
           options={{
             href: null,
             headerShown: false,

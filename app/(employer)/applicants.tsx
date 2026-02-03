@@ -1,39 +1,38 @@
 import {
-    Applicant,
-    APPLICATION_STATUS_CONFIG,
-    ApplicationStatus,
-    getApplicantStats,
-    mockApplicants,
+  Applicant,
+  APPLICATION_STATUS_CONFIG,
+  ApplicationStatus,
+  getApplicantStats,
+  mockApplicants,
 } from "@/data/mock-applicants";
-import { useNavigationVisibility } from "@/hooks/use-navigation-visibility";
 import { useRouter } from "expo-router";
 import {
-    ArrowLeft,
-    Briefcase,
-    Calendar,
-    CheckCircle,
-    Clock,
-    Filter,
-    GraduationCap,
-    Mail,
-    MoreVertical,
-    Phone,
-    Search,
-    Star,
-    User,
-    X
+  ArrowLeft,
+  Briefcase,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Filter,
+  GraduationCap,
+  Mail,
+  MoreVertical,
+  Phone,
+  Search,
+  Star,
+  User,
+  X,
 } from "lucide-react-native";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
-    FlatList,
-    Image,
-    Modal,
-    ScrollView,
-    StatusBar,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  Modal,
+  ScrollView,
+  StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -553,7 +552,6 @@ const FilterModal = ({
 
 export default function ApplicantsScreen() {
   const router = useRouter();
-  const { setNavigationVisible } = useNavigationVisibility();
   const [applicants, setApplicants] = useState<Applicant[]>(mockApplicants);
   const [activeTab, setActiveTab] = useState<ApplicantTabType>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -563,12 +561,6 @@ export default function ApplicantsScreen() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [selectedJob, setSelectedJob] = useState("all");
-
-  // Hide bottom navigation
-  useEffect(() => {
-    setNavigationVisible(false);
-    return () => setNavigationVisible(true);
-  }, []);
 
   // Get unique jobs
   const uniqueJobs = useMemo(() => {

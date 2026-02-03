@@ -1,25 +1,24 @@
 import { mockApplicants } from "@/data/mock-applicants";
 import { mockEmployerJobs } from "@/data/mock-employer-jobs";
-import { useNavigationVisibility } from "@/hooks/use-navigation-visibility";
 import { useRouter } from "expo-router";
 import {
-    ArrowDown,
-    ArrowLeft,
-    ArrowUp,
-    Briefcase,
-    CheckCircle,
-    Eye,
-    TrendingUp,
-    Users,
+  ArrowDown,
+  ArrowLeft,
+  ArrowUp,
+  Briefcase,
+  CheckCircle,
+  Eye,
+  TrendingUp,
+  Users,
 } from "lucide-react-native";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import {
-    Dimensions,
-    ScrollView,
-    StatusBar,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -229,14 +228,7 @@ const TimePeriodSelector = ({
 
 export default function AnalyticsScreen() {
   const router = useRouter();
-  const { setNavigationVisible } = useNavigationVisibility();
   const [selectedPeriod, setSelectedPeriod] = React.useState("30d");
-
-  // Hide bottom navigation
-  useEffect(() => {
-    setNavigationVisible(false);
-    return () => setNavigationVisible(true);
-  }, []);
 
   // Calculate stats from mock data
   const stats = useMemo(() => {

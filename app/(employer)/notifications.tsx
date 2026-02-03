@@ -1,12 +1,22 @@
+import { useRouter } from "expo-router";
 import {
-    Bell,
-    CheckCircle,
-    MessageCircle,
-    Star,
-    UserPlus,
+  Bell,
+  CheckCircle,
+  ChevronLeft,
+  MessageCircle,
+  Star,
+  UserPlus,
 } from "lucide-react-native";
 import React, { useCallback, useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Notification data type for employers
 interface Notification {
@@ -207,9 +217,18 @@ const NotificationItem = ({ notification, onPress }: NotificationItemProps) => (
 );
 
 export default function EmployerNotificationsScreen() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"all" | "applications">("all");
   const [notifications, setNotifications] =
     useState<Notification[]>(initialNotifications);
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(employer)");
+    }
+  };
 
   // Mark a single notification as read
   const handleMarkAsRead = useCallback((notificationId: string) => {
@@ -240,109 +259,128 @@ export default function EmployerNotificationsScreen() {
   ).length;
 
   return (
-    <View className="flex-1 bg-gray-50">
-      {/* Tabs */}
-      <View className="flex-row bg-white px-4 py-1 border-b border-gray-200">
-        <TouchableOpacity
-          className={`flex-row items-center py-3.5 px-4 mr-2 gap-2 ${activeTab === "all" ? "border-b-[3px]" : ""}`}
-          style={activeTab === "all" ? { borderBottomColor: "#8B2635" } : {}}
-          onPress={() => setActiveTab("all")}
+    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+      {/* Header with Back Button */}
+      <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
+        <Pressable
+          onPress={handleBack}
+          className="w-10 h-10 items-center justify-center rounded-full"
+          style={{ backgroundColor: "#F5F5F5" }}
         >
-          <Text
-            className={`text-[15px] font-medium ${activeTab === "all" ? "font-semibold" : "text-gray-500"}`}
-            style={activeTab === "all" ? { color: "#8B2635" } : {}}
-          >
-            All
-          </Text>
-          {unreadCount > 0 && (
-            <View
-              className="rounded-full px-2 py-0.5"
-              style={{ backgroundColor: "#8B2635" }}
-            >
-              <Text className="text-white text-xs font-semibold">
-                {unreadCount}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          className={`flex-row items-center py-3.5 px-4 mr-2 gap-2 ${activeTab === "applications" ? "border-b-[3px]" : ""}`}
-          style={
-            activeTab === "applications" ? { borderBottomColor: "#8B2635" } : {}
-          }
-          onPress={() => setActiveTab("applications")}
-        >
-          <Text
-            className={`text-[15px] font-medium ${activeTab === "applications" ? "font-semibold" : "text-gray-500"}`}
-            style={activeTab === "applications" ? { color: "#8B2635" } : {}}
-          >
-            Applications
-          </Text>
-          <View className="rounded-full px-2 py-0.5 bg-green-100">
-            <Text className="text-green-600 text-xs font-semibold">
-              {applicationCount}
-            </Text>
-          </View>
-        </TouchableOpacity>
+          <ChevronLeft size={24} color="#1F2937" />
+        </Pressable>
+        <Text className="text-lg font-semibold text-gray-800">
+          Notifications
+        </Text>
+        <View className="w-10" />
       </View>
 
-      {/* Mark all as read button */}
-      {unreadCount > 0 && (
-        <TouchableOpacity
-          className="bg-white py-3 px-4 border-b border-gray-200"
-          onPress={handleMarkAllAsRead}
-        >
-          <Text
-            className="text-sm font-semibold text-right"
-            style={{ color: "#8B2635" }}
+      <View className="flex-1 bg-gray-50">
+        {/* Tabs */}
+        <View className="flex-row bg-white px-4 py-1 border-b border-gray-200">
+          <TouchableOpacity
+            className={`flex-row items-center py-3.5 px-4 mr-2 gap-2 ${activeTab === "all" ? "border-b-[3px]" : ""}`}
+            style={activeTab === "all" ? { borderBottomColor: "#8B2635" } : {}}
+            onPress={() => setActiveTab("all")}
           >
-            Mark all as read
-          </Text>
-        </TouchableOpacity>
-      )}
-
-      {/* Notifications List */}
-      <ScrollView
-        className="flex-1 bg-white"
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Today Section */}
-        <View className="px-4 py-3 bg-gray-100">
-          <Text className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-            Today
-          </Text>
+            <Text
+              className={`text-[15px] font-medium ${activeTab === "all" ? "font-semibold" : "text-gray-500"}`}
+              style={activeTab === "all" ? { color: "#8B2635" } : {}}
+            >
+              All
+            </Text>
+            {unreadCount > 0 && (
+              <View
+                className="rounded-full px-2 py-0.5"
+                style={{ backgroundColor: "#8B2635" }}
+              >
+                <Text className="text-white text-xs font-semibold">
+                  {unreadCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            className={`flex-row items-center py-3.5 px-4 mr-2 gap-2 ${activeTab === "applications" ? "border-b-[3px]" : ""}`}
+            style={
+              activeTab === "applications"
+                ? { borderBottomColor: "#8B2635" }
+                : {}
+            }
+            onPress={() => setActiveTab("applications")}
+          >
+            <Text
+              className={`text-[15px] font-medium ${activeTab === "applications" ? "font-semibold" : "text-gray-500"}`}
+              style={activeTab === "applications" ? { color: "#8B2635" } : {}}
+            >
+              Applications
+            </Text>
+            <View className="rounded-full px-2 py-0.5 bg-green-100">
+              <Text className="text-green-600 text-xs font-semibold">
+                {applicationCount}
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
-        {filteredNotifications.slice(0, 3).map((notification) => (
-          <NotificationItem
-            key={notification.id}
-            notification={notification}
-            onPress={() => handleMarkAsRead(notification.id)}
-          />
-        ))}
 
-        {/* Earlier Section */}
-        <View className="px-4 py-3 bg-gray-100">
-          <Text className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-            Earlier
-          </Text>
-        </View>
-        {filteredNotifications.slice(3).map((notification) => (
-          <NotificationItem
-            key={notification.id}
-            notification={notification}
-            onPress={() => handleMarkAsRead(notification.id)}
-          />
-        ))}
-
-        {filteredNotifications.length === 0 && (
-          <View className="flex-1 justify-center items-center py-16 gap-3">
-            <Bell size={48} color="#ccc" />
-            <Text className="text-base text-gray-400">No notifications</Text>
-          </View>
+        {/* Mark all as read button */}
+        {unreadCount > 0 && (
+          <TouchableOpacity
+            className="bg-white py-3 px-4 border-b border-gray-200"
+            onPress={handleMarkAllAsRead}
+          >
+            <Text
+              className="text-sm font-semibold text-right"
+              style={{ color: "#8B2635" }}
+            >
+              Mark all as read
+            </Text>
+          </TouchableOpacity>
         )}
 
-        <View className="h-5" />
-      </ScrollView>
-    </View>
+        {/* Notifications List */}
+        <ScrollView
+          className="flex-1 bg-white"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Today Section */}
+          <View className="px-4 py-3 bg-gray-100">
+            <Text className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+              Today
+            </Text>
+          </View>
+          {filteredNotifications.slice(0, 3).map((notification) => (
+            <NotificationItem
+              key={notification.id}
+              notification={notification}
+              onPress={() => handleMarkAsRead(notification.id)}
+            />
+          ))}
+
+          {/* Earlier Section */}
+          <View className="px-4 py-3 bg-gray-100">
+            <Text className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+              Earlier
+            </Text>
+          </View>
+          {filteredNotifications.slice(3).map((notification) => (
+            <NotificationItem
+              key={notification.id}
+              notification={notification}
+              onPress={() => handleMarkAsRead(notification.id)}
+            />
+          ))}
+
+          {filteredNotifications.length === 0 && (
+            <View className="flex-1 justify-center items-center py-16 gap-3">
+              <Bell size={48} color="#ccc" />
+              <Text className="text-base text-gray-400">No notifications</Text>
+            </View>
+          )}
+
+          <View className="h-5" />
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }

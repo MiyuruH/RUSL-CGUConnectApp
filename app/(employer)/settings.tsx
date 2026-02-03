@@ -1,40 +1,39 @@
 import { MenuDivider, MenuItem, MenuSection } from "@/components/ui/menu-item";
 import { mockEmployer } from "@/data/mock-employer";
-import { useNavigationVisibility } from "@/hooks/use-navigation-visibility";
 import { useRouter } from "expo-router";
 import {
-    Bell,
-    Building2,
-    Camera,
-    Check,
-    ChevronLeft,
-    CircleHelp,
-    Edit3,
-    Globe,
-    Info,
-    Lock,
-    LogOut,
-    Mail,
-    MapPin,
-    Phone,
-    Settings,
-    Users,
-    X,
+  Bell,
+  Building2,
+  Camera,
+  Check,
+  ChevronLeft,
+  CircleHelp,
+  Edit3,
+  Globe,
+  Info,
+  Lock,
+  LogOut,
+  Mail,
+  MapPin,
+  Phone,
+  Settings,
+  Users,
+  X,
 } from "lucide-react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    Pressable,
-    ScrollView,
-    Switch,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -214,7 +213,6 @@ type SettingsSubScreen =
 export default function EmployerSettingsScreen() {
   const router = useRouter();
   const [activeScreen, setActiveScreen] = useState<SettingsSubScreen>("main");
-  const { setNavigationVisible } = useNavigationVisibility();
 
   // Company Profile State
   const [profile, setProfile] = useState({
@@ -241,11 +239,6 @@ export default function EmployerSettingsScreen() {
     multiline?: boolean;
     keyboardType?: "default" | "email-address" | "phone-pad" | "url";
   }>({ visible: false, field: "", value: "" });
-
-  // Update navigation visibility when activeScreen changes
-  useEffect(() => {
-    setNavigationVisible(activeScreen === "main");
-  }, [activeScreen, setNavigationVisible]);
 
   const handleBack = () => {
     if (activeScreen !== "main") {
