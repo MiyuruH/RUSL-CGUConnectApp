@@ -46,8 +46,8 @@ export default function WelcomeScreen() {
       <LinearGradient
         colors={
           isDark
-            ? ["#0f172a", "#134e4a", "#0f172a"]
-            : ["#f0fdfa", "#ccfbf1", "#f0fdfa"]
+            ? ["#1a0a0d", "#2d1216", "#1a0a0d"]
+            : ["#fdf2f4", "#fce7ea", "#fdf2f4"]
         }
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -56,11 +56,15 @@ export default function WelcomeScreen() {
         {/* Decorative circles */}
         <View
           className="absolute top-[-100px] right-[-100px] w-[300px] h-[300px] rounded-full opacity-20"
-          style={{ backgroundColor: "#14b8a6" }}
+          style={{ backgroundColor: "#8B2735" }}
         />
         <View
           className="absolute bottom-[-150px] left-[-100px] w-[350px] h-[350px] rounded-full opacity-10"
-          style={{ backgroundColor: "#0d9488" }}
+          style={{ backgroundColor: "#661c28" }}
+        />
+        <View
+          className="absolute top-[30%] left-[-50px] w-[150px] h-[150px] rounded-full opacity-10"
+          style={{ backgroundColor: "#D4A843" }}
         />
 
         <View className="items-center flex-1 justify-center w-4/5">
@@ -73,9 +77,9 @@ export default function WelcomeScreen() {
               className="p-6 rounded-3xl"
               style={{
                 backgroundColor: isDark
-                  ? "rgba(20, 184, 166, 0.1)"
-                  : "rgba(20, 184, 166, 0.05)",
-                shadowColor: "#14b8a6",
+                  ? "rgba(139, 39, 53, 0.15)"
+                  : "rgba(139, 39, 53, 0.08)",
+                shadowColor: "#8B2735",
                 shadowOffset: { width: 0, height: 8 },
                 shadowOpacity: 0.3,
                 shadowRadius: 16,
@@ -103,13 +107,26 @@ export default function WelcomeScreen() {
             entering={FadeInUp.delay(900).duration(600)}
             className="items-center"
           >
-            <View className="h-1 w-16 rounded-full bg-primary-500 mb-4" />
+            <LinearGradient
+              colors={["#8B2735", "#D4A843"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              className="h-1 w-20 rounded-full mb-4"
+            />
             <Text
-              className={`font-SourceSans3Medium text-xl ${isDark ? "text-primary-300" : "text-primary-600"}`}
+              className={`font-SourceSans3Medium text-xl ${isDark ? "text-primary-300" : "text-primary-500"}`}
             >
               Career Guidance Unit
             </Text>
           </Animated.View>
+
+          {/* Tagline */}
+          <Animated.Text
+            entering={FadeInUp.delay(1000).duration(600)}
+            className={`font-SourceSans3Medium text-sm text-center mt-4 ${isDark ? "text-slate-400" : "text-slate-500"}`}
+          >
+            Your Gateway to Career Success
+          </Animated.Text>
         </View>
 
         {/* Bottom indicator with pulse animation */}

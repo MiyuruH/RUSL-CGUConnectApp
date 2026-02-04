@@ -8,8 +8,8 @@ import { Colors } from "@/constants/theme";
 import { mockNotifications, mockUser } from "@/data/mock-user";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
-    NavigationVisibilityProvider,
-    useNavigationVisibility,
+  NavigationVisibilityProvider,
+  useNavigationVisibility,
 } from "@/hooks/use-navigation-visibility";
 import * as NavigationBar from "expo-navigation-bar";
 import { Briefcase, Home, MessageSquareText } from "lucide-react-native";
@@ -24,19 +24,22 @@ function TabLayoutContent() {
   );
 
   // Pages where top header and bottom tabs should be visible
-  const mainPages = ["/", "/index", "/jobs", "/messages", "/profile"];
+  const mainPages = [
+    "/",
+    "/index",
+    "/jobs",
+    "/messages",
+    "/profile",
+    "/notifications",
+  ];
   const isMainPage = mainPages.includes(pathname);
 
-  // Hide navigation on job-details and notifications page (notifications has its own header)
+  // Hide navigation on job-details page
   const isJobDetailsPage = pathname.includes("job-details");
-  const isNotificationsPage = pathname.includes("notifications");
 
   // Show navigation only on main pages and when context allows it
   const shouldShowNavigation =
-    isMainPage &&
-    !isJobDetailsPage &&
-    !isNotificationsPage &&
-    isNavigationVisible;
+    isMainPage && !isJobDetailsPage && isNavigationVisible;
 
   useEffect(() => {
     if (Platform.OS === "android") {
@@ -115,6 +118,27 @@ function TabLayoutContent() {
         />
         <Tabs.Screen
           name="profile"
+          options={{
+            href: null,
+            headerShown: false,
+          }}
+        />
+        <Tabs.Screen
+          name="all-categories"
+          options={{
+            href: null,
+            headerShown: false,
+          }}
+        />
+        <Tabs.Screen
+          name="all-companies"
+          options={{
+            href: null,
+            headerShown: false,
+          }}
+        />
+        <Tabs.Screen
+          name="category-jobs"
           options={{
             href: null,
             headerShown: false,

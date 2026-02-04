@@ -6,18 +6,31 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Premium primary palette
+        // Premium primary palette - Maroon/Burgundy theme (#8B2735)
         primary: {
-          50: "#f0fdfa",
-          100: "#ccfbf1",
-          200: "#99f6e4",
-          300: "#5eead4",
-          400: "#2dd4bf",
-          500: "#14b8a6",
-          600: "#0d9488",
-          700: "#0f766e",
-          800: "#115e59",
-          900: "#134e4a",
+          50: "#fdf2f4",
+          100: "#fce7ea",
+          200: "#f9d0d7",
+          300: "#f4a9b6",
+          400: "#ec7a8f",
+          500: "#8B2735", // Main brand color
+          600: "#7a222f",
+          700: "#661c28",
+          800: "#551924",
+          900: "#481921",
+        },
+        // Secondary colors - Gold/Amber accent
+        secondary: {
+          50: "#fffbeb",
+          100: "#fef3c7",
+          200: "#fde68a",
+          300: "#fcd34d",
+          400: "#fbbf24",
+          500: "#D4A843", // Complementary gold
+          600: "#b8922e",
+          700: "#92731a",
+          800: "#78600f",
+          900: "#5c4a0a",
         },
         // Accent colors
         accent: {
@@ -31,9 +44,9 @@ module.exports = {
         },
         // Surface colors for dark mode
         surface: {
-          dark: "#0f172a",
-          card: "#1e293b",
-          elevated: "#334155",
+          dark: "#1a0a0d",
+          card: "#2d1216",
+          elevated: "#3d1a1f",
         },
       },
       fontFamily: {

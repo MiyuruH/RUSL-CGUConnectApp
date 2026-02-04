@@ -66,7 +66,7 @@ export function Button({
   const buttonContent = (
     <>
       {loading ? (
-        <ActivityIndicator color={variant === "primary" ? "#fff" : "#14b8a6"} />
+        <ActivityIndicator color={variant === "primary" ? "#fff" : "#8B2735"} />
       ) : (
         <Text
           className={`text-base font-semibold ${variantClasses.text} ${textClassName}`}
@@ -86,14 +86,14 @@ export function Button({
         className={`overflow-hidden rounded-2xl active:opacity-90 active:scale-[0.98] ${className}`}
         style={{
           elevation: 8,
-          shadowColor: "#14b8a6",
+          shadowColor: "#8B2735",
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 8,
         }}
       >
         <LinearGradient
-          colors={["#14b8a6", "#0d9488", "#0f766e"]}
+          colors={["#8B2735", "#7a222f", "#661c28"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={{
@@ -116,7 +116,7 @@ export function Button({
       <View className={`rounded-2xl overflow-hidden opacity-50 ${className}`}>
         <View
           style={{
-            backgroundColor: "#14b8a6",
+            backgroundColor: "#8B2735",
             paddingVertical: 16,
             paddingHorizontal: 24,
             alignItems: "center",

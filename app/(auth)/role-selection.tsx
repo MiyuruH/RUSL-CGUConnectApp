@@ -1,7 +1,12 @@
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { Building2, ChevronRight, GraduationCap } from "lucide-react-native";
+import {
+    ArrowLeft,
+    Building2,
+    ChevronRight,
+    GraduationCap,
+} from "lucide-react-native";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -11,15 +16,19 @@ const roles = [
     id: "jobseeker",
     label: "Job Seeker",
     icon: GraduationCap,
-    description: "Find jobs, internships, and career opportunities",
-    gradientColors: ["#14b8a6", "#0d9488"] as const,
+    description:
+      "Find jobs, internships, and career opportunities tailored for you",
+    gradientColors: ["#8B2735", "#661c28"] as const,
+    bgColor: "#fdf2f4",
   },
   {
     id: "employer",
     label: "Employer",
     icon: Building2,
-    description: "Post jobs and find talented graduates",
-    gradientColors: ["#8b5cf6", "#7c3aed"] as const,
+    description:
+      "Post jobs and discover talented graduates from Rajarata University",
+    gradientColors: ["#D4A843", "#b8922e"] as const,
+    bgColor: "#fffbeb",
   },
 ];
 
@@ -37,13 +46,30 @@ export default function RoleSelectionScreen() {
       className={`flex-1 ${isDark ? "bg-surface-dark" : "bg-slate-50"}`}
     >
       <ScrollView
-        contentContainerStyle={{ padding: 24, paddingTop: 48 }}
+        contentContainerStyle={{ padding: 24, paddingTop: 16 }}
         showsVerticalScrollIndicator={false}
       >
+        {/* Back button */}
+        <Animated.View entering={FadeInDown.delay(50).duration(400)}>
+          <Pressable
+            onPress={() => router.back()}
+            className={`self-start mb-6 p-2 rounded-xl ${isDark ? "bg-slate-800" : "bg-white"}`}
+            style={{
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.05,
+              shadowRadius: 4,
+              elevation: 2,
+            }}
+          >
+            <ArrowLeft size={22} color={isDark ? "#fff" : "#334155"} />
+          </Pressable>
+        </Animated.View>
+
         {/* Header Section */}
         <Animated.View entering={FadeInDown.delay(100).duration(500)}>
           <Text
-            className={`text-sm font-semibold tracking-widest uppercase mb-2 ${isDark ? "text-primary-400" : "text-primary-600"}`}
+            className={`text-sm font-semibold tracking-widest uppercase mb-2 ${isDark ? "text-primary-400" : "text-primary-500"}`}
           >
             CGU Connect
           </Text>
@@ -88,7 +114,7 @@ export default function RoleSelectionScreen() {
                       colors={[...role.gradientColors]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
-                      className="h-1"
+                      className="h-1.5"
                     />
 
                     <View className="p-6">
@@ -105,7 +131,7 @@ export default function RoleSelectionScreen() {
 
                         <View className="flex-1">
                           <Text
-                            className={`text-xl font-bold mb-1 ${isDark ? "text-white" : "text-slate-900"}`}
+                            className={`text-xl font-bold mb-1.5 ${isDark ? "text-white" : "text-slate-900"}`}
                           >
                             {role.label}
                           </Text>
@@ -118,11 +144,14 @@ export default function RoleSelectionScreen() {
 
                         {/* Arrow indicator */}
                         <View
-                          className={`w-10 h-10 rounded-xl items-center justify-center ${isDark ? "bg-slate-700" : "bg-slate-100"}`}
+                          className={`w-10 h-10 rounded-xl items-center justify-center`}
+                          style={{
+                            backgroundColor: isDark ? "#3d1a1f" : role.bgColor,
+                          }}
                         >
                           <ChevronRight
                             size={20}
-                            color={isDark ? "#94a3b8" : "#64748b"}
+                            color={role.gradientColors[0]}
                           />
                         </View>
                       </View>
@@ -143,8 +172,13 @@ export default function RoleSelectionScreen() {
             className={`text-sm text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}
           >
             By continuing, you agree to our{" "}
-            <Text className="text-primary-500">Terms of Service</Text> and{" "}
-            <Text className="text-primary-500">Privacy Policy</Text>
+            <Text className="text-primary-500 font-semibold">
+              Terms of Service
+            </Text>{" "}
+            and{" "}
+            <Text className="text-primary-500 font-semibold">
+              Privacy Policy
+            </Text>
           </Text>
         </Animated.View>
       </ScrollView>

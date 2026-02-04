@@ -26,13 +26,13 @@ export function Input({
 
   const getBorderColor = () => {
     if (error) return "#ef4444";
-    if (isFocused) return isDark ? "#2dd4bf" : "#14b8a6";
+    if (isFocused) return isDark ? "#ec7a8f" : "#8B2735";
     return isDark ? "#475569" : "#e2e8f0";
   };
 
   const getBackgroundColor = () => {
-    if (isDark) return "#1e293b";
-    return isFocused ? "#ffffff" : "#f8fafc";
+    if (isDark) return "#2d1216";
+    return isFocused ? "#ffffff" : "#fdf2f4";
   };
 
   const handleContainerPress = () => {
@@ -64,7 +64,7 @@ export function Input({
           backgroundColor: getBackgroundColor(),
           ...(isFocused && !error
             ? {
-                shadowColor: "#14b8a6",
+                shadowColor: "#8B2735",
                 shadowOffset: { width: 0, height: 0 },
                 shadowOpacity: 0.15,
                 shadowRadius: 8,
