@@ -1,37 +1,39 @@
-import { LinearGradient } from "expo-linear-gradient";
+import { MenuDivider, MenuItem, MenuSection } from "@/components/ui/menu-item";
+import { mockEmployer } from "@/data/mock-employer";
 import { useRouter } from "expo-router";
 import {
-    ArrowLeft,
-    Bell,
-    Building2,
-    Camera,
-    Check,
-    ChevronRight,
-    Edit3,
-    Globe,
-    HelpCircle,
-    Info,
-    Lock,
-    LogOut,
-    Mail,
-    MapPin,
-    Phone,
-    Users,
-    X,
+  Bell,
+  Building2,
+  Camera,
+  Check,
+  ChevronLeft,
+  CircleHelp,
+  Edit3,
+  Globe,
+  Info,
+  Lock,
+  LogOut,
+  Mail,
+  MapPin,
+  Phone,
+  Settings,
+  Users,
+  X,
 } from "lucide-react-native";
 import React, { useState } from "react";
 import {
-    Image,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    ScrollView,
-    StatusBar,
-    Switch,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -74,29 +76,21 @@ const ProfileField = ({
   </View>
 );
 
-// Settings Item Component
-interface SettingsItemProps {
+// Settings Toggle Item Component
+interface SettingsToggleItemProps {
   icon: React.ReactNode;
   label: string;
-  hasToggle?: boolean;
-  toggleValue?: boolean;
-  onToggle?: (value: boolean) => void;
-  onPress?: () => void;
+  value: boolean;
+  onToggle: (value: boolean) => void;
 }
 
-const SettingsItem = ({
+const SettingsToggleItem = ({
   icon,
   label,
-  hasToggle,
-  toggleValue,
+  value,
   onToggle,
-  onPress,
-}: SettingsItemProps) => (
-  <TouchableOpacity
-    className="flex-row items-center justify-between bg-white py-3.5 px-4 rounded-xl mb-2"
-    onPress={onPress}
-    disabled={hasToggle}
-  >
+}: SettingsToggleItemProps) => (
+  <View className="flex-row items-center justify-between bg-white py-3.5 px-4 rounded-xl mb-2">
     <View className="flex-row items-center gap-3">
       <View
         className="w-9 h-9 rounded-xl justify-center items-center"
@@ -106,17 +100,13 @@ const SettingsItem = ({
       </View>
       <Text className="text-[15px] text-gray-900 font-medium">{label}</Text>
     </View>
-    {hasToggle ? (
-      <Switch
-        value={toggleValue}
-        onValueChange={onToggle}
-        trackColor={{ false: "#E0E0E0", true: "#FFCDD2" }}
-        thumbColor={toggleValue ? "#8B2635" : "#fff"}
-      />
-    ) : (
-      <ChevronRight size={20} color="#999" />
-    )}
-  </TouchableOpacity>
+    <Switch
+      value={value}
+      onValueChange={onToggle}
+      trackColor={{ false: "#E0E0E0", true: "#FFCDD2" }}
+      thumbColor={value ? "#8B2635" : "#fff"}
+    />
+  </View>
 );
 
 // Edit Modal Component
@@ -210,20 +200,31 @@ const EditModal = ({
   );
 };
 
+// Define screen types for navigation
+type SettingsSubScreen =
+  | "main"
+  | "company-info"
+  | "contact-info"
+  | "account-settings"
+  | "privacy-settings"
+  | "help-support"
+  | "about";
+
 export default function EmployerSettingsScreen() {
   const router = useRouter();
+  const [activeScreen, setActiveScreen] = useState<SettingsSubScreen>("main");
 
   // Company Profile State
   const [profile, setProfile] = useState({
-    companyName: "Tech Solutions Lanka",
-    registrationNo: "PV00123456",
-    logo: "https://api.dicebear.com/7.x/initials/png?seed=TSL&backgroundColor=8B2635",
-    industry: "Information Technology & Services",
-    companySize: "50-200 employees",
-    address: "123 Galle Road, Colombo 03, Sri Lanka",
-    phone: "+94 11 234 5678",
-    email: "hr@techsolutions.lk",
-    website: "www.techsolutions.lk",
+    companyName: mockEmployer.companyName,
+    registrationNo: mockEmployer.registrationNo,
+    logo: mockEmployer.logo,
+    industry: mockEmployer.industry,
+    companySize: mockEmployer.companySize,
+    address: mockEmployer.address,
+    phone: mockEmployer.phone,
+    email: mockEmployer.email,
+    website: mockEmployer.website,
   });
 
   // Settings State
@@ -231,7 +232,6 @@ export default function EmployerSettingsScreen() {
   const [emailNotifications, setEmailNotifications] = useState(true);
 
   // Modal States
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [editModal, setEditModal] = useState<{
     visible: boolean;
     field: string;
@@ -240,9 +240,30 @@ export default function EmployerSettingsScreen() {
     keyboardType?: "default" | "email-address" | "phone-pad" | "url";
   }>({ visible: false, field: "", value: "" });
 
+  const handleBack = () => {
+    if (activeScreen !== "main") {
+      setActiveScreen("main");
+    } else {
+      router.back();
+    }
+  };
+
   const handleLogout = () => {
-    setShowLogoutModal(false);
-    router.replace("/(auth)" as any);
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to log out of your company account?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: () => {
+            router.replace("/(auth)" as any);
+          },
+        },
+      ],
+      { cancelable: true },
+    );
   };
 
   const openEditModal = (
@@ -271,191 +292,282 @@ export default function EmployerSettingsScreen() {
     }
   };
 
-  return (
-    <View className="flex-1 bg-gray-100">
-      <StatusBar barStyle="light-content" backgroundColor="#8B2635" />
+  // Get screen title based on active screen
+  const getScreenTitle = (): string => {
+    switch (activeScreen) {
+      case "company-info":
+        return "Company Information";
+      case "contact-info":
+        return "Contact Information";
+      case "account-settings":
+        return "Account Settings";
+      case "privacy-settings":
+        return "Privacy Settings";
+      case "help-support":
+        return "Help & Support";
+      case "about":
+        return "About CGUConnect";
+      default:
+        return "Company Profile";
+    }
+  };
 
-      {/* Header */}
-      <LinearGradient
-        colors={["#8B2635", "#7D1F2E", "#6B1A27"]}
-        className="pb-4"
-      >
-        <SafeAreaView edges={["top"]} className="px-4">
-          <View className="flex-row items-center justify-between pt-2">
-            <TouchableOpacity
-              className="p-2 -ml-2"
-              onPress={() => router.back()}
-            >
-              <ArrowLeft size={24} color="#fff" />
-            </TouchableOpacity>
-            <Text className="text-xl font-bold text-white">
-              Company Profile
-            </Text>
-            <View className="w-10" />
-          </View>
-        </SafeAreaView>
-      </LinearGradient>
+  // Render Company Info Screen
+  const renderCompanyInfoScreen = () => (
+    <ScrollView
+      className="flex-1"
+      contentContainerStyle={{ padding: 16 }}
+      showsVerticalScrollIndicator={false}
+    >
+      <View className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <ProfileField
+          icon={<Building2 size={20} color="#8B2635" />}
+          label="Company Name"
+          value={profile.companyName}
+          onEdit={() => openEditModal("Company Name", profile.companyName)}
+        />
+        <View className="h-px bg-gray-100 ml-12" />
 
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ paddingBottom: 20 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Company Logo Section */}
-        <View className="items-center py-6 bg-white mb-4">
-          <View className="relative mb-3">
+        <ProfileField
+          icon={<Users size={20} color="#8B2635" />}
+          label="Industry"
+          value={profile.industry}
+          onEdit={() => openEditModal("Industry", profile.industry)}
+        />
+        <View className="h-px bg-gray-100 ml-12" />
+
+        <ProfileField
+          icon={<Users size={20} color="#8B2635" />}
+          label="Company Size"
+          value={profile.companySize}
+          onEdit={() => openEditModal("Company Size", profile.companySize)}
+        />
+      </View>
+    </ScrollView>
+  );
+
+  // Render Contact Info Screen
+  const renderContactInfoScreen = () => (
+    <ScrollView
+      className="flex-1"
+      contentContainerStyle={{ padding: 16 }}
+      showsVerticalScrollIndicator={false}
+    >
+      <View className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <ProfileField
+          icon={<MapPin size={20} color="#8B2635" />}
+          label="Address"
+          value={profile.address}
+          onEdit={() => openEditModal("Address", profile.address, true)}
+        />
+        <View className="h-px bg-gray-100 ml-12" />
+
+        <ProfileField
+          icon={<Phone size={20} color="#8B2635" />}
+          label="Phone"
+          value={profile.phone}
+          onEdit={() =>
+            openEditModal("Phone", profile.phone, false, "phone-pad")
+          }
+        />
+        <View className="h-px bg-gray-100 ml-12" />
+
+        <ProfileField
+          icon={<Mail size={20} color="#8B2635" />}
+          label="Email"
+          value={profile.email}
+          onEdit={() =>
+            openEditModal("Email", profile.email, false, "email-address")
+          }
+        />
+        <View className="h-px bg-gray-100 ml-12" />
+
+        <ProfileField
+          icon={<Globe size={20} color="#8B2635" />}
+          label="Website"
+          value={profile.website}
+          onEdit={() => openEditModal("Website", profile.website, false, "url")}
+        />
+      </View>
+    </ScrollView>
+  );
+
+  // Render Account Settings Screen
+  const renderAccountSettingsScreen = () => (
+    <ScrollView
+      className="flex-1"
+      contentContainerStyle={{ padding: 16 }}
+      showsVerticalScrollIndicator={false}
+    >
+      <SettingsToggleItem
+        icon={<Bell size={20} color="#8B2635" />}
+        label="Push Notifications"
+        value={notificationsEnabled}
+        onToggle={setNotificationsEnabled}
+      />
+
+      <SettingsToggleItem
+        icon={<Mail size={20} color="#8B2635" />}
+        label="Email Notifications"
+        value={emailNotifications}
+        onToggle={setEmailNotifications}
+      />
+
+      <View className="mt-4">
+        <MenuItem
+          title="Change Password"
+          subtitle="Update your password"
+          icon={Lock}
+          onPress={() => {}}
+        />
+      </View>
+    </ScrollView>
+  );
+
+  // Render screen based on active screen
+  const renderScreen = () => {
+    switch (activeScreen) {
+      case "company-info":
+        return renderCompanyInfoScreen();
+      case "contact-info":
+        return renderContactInfoScreen();
+      case "account-settings":
+        return renderAccountSettingsScreen();
+      default:
+        return renderMainProfile();
+    }
+  };
+
+  const renderMainProfile = () => (
+    <>
+      {/* Profile Info Card */}
+      <View className="bg-white mx-4 mt-4 rounded-2xl p-5 shadow-sm border border-gray-100">
+        <View className="items-center">
+          {/* Company Logo with Edit Button */}
+          <View className="relative mb-4">
             <Image
               source={{ uri: profile.logo }}
-              className="w-[100px] h-[100px] rounded-2xl border-[3px]"
+              className="w-24 h-24 rounded-2xl border-[3px]"
               style={{ borderColor: "#FFE8EC" }}
             />
-            <TouchableOpacity
-              className="absolute bottom-0 right-0 w-8 h-8 rounded-full justify-center items-center border-2 border-white"
-              style={{ backgroundColor: "#8B2635" }}
+            <Pressable
+              className="absolute bottom-0 right-0 w-8 h-8 rounded-full items-center justify-center shadow-md"
+              style={({ pressed }) => ({
+                backgroundColor: "#8B2635",
+                opacity: pressed ? 0.8 : 1,
+              })}
             >
-              <Camera size={18} color="#fff" />
-            </TouchableOpacity>
+              <Camera size={16} color="#fff" />
+            </Pressable>
           </View>
-          <Text className="text-[22px] font-bold text-gray-900 mb-1">
+
+          {/* Company Name */}
+          <Text className="text-2xl font-bold text-gray-900 mb-1">
             {profile.companyName}
           </Text>
-          <Text className="text-sm text-gray-500">
+
+          {/* Registration Number */}
+          <Text className="text-sm text-gray-400">
             {profile.registrationNo}
           </Text>
         </View>
+      </View>
 
-        {/* Company Information Card */}
-        <View className="bg-white mx-4 mb-4 rounded-2xl p-4 shadow-sm">
-          <Text className="text-[17px] font-bold text-gray-900 mb-4">
-            Company Information
-          </Text>
-
-          <ProfileField
-            icon={<Building2 size={20} color="#8B2635" />}
-            label="Company Name"
-            value={profile.companyName}
-            onEdit={() => openEditModal("Company Name", profile.companyName)}
+      {/* Menu Sections */}
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ paddingTop: 16, paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Company Section */}
+        <MenuSection title="Company">
+          <MenuItem
+            title="Company Information"
+            subtitle="Name, industry, size"
+            icon={Building2}
+            onPress={() => setActiveScreen("company-info")}
           />
-          <View className="h-px bg-gray-100 ml-12" />
-
-          <ProfileField
-            icon={<Users size={20} color="#8B2635" />}
-            label="Industry"
-            value={profile.industry}
-            onEdit={() => openEditModal("Industry", profile.industry)}
+          <MenuDivider />
+          <MenuItem
+            title="Contact Information"
+            subtitle="Address, phone, email"
+            icon={Phone}
+            onPress={() => setActiveScreen("contact-info")}
           />
-          <View className="h-px bg-gray-100 ml-12" />
+        </MenuSection>
 
-          <ProfileField
-            icon={<Users size={20} color="#8B2635" />}
-            label="Company Size"
-            value={profile.companySize}
-            onEdit={() => openEditModal("Company Size", profile.companySize)}
+        {/* Settings Section */}
+        <MenuSection title="Settings">
+          <MenuItem
+            title="Account Settings"
+            subtitle="Notifications, password"
+            icon={Settings}
+            onPress={() => setActiveScreen("account-settings")}
           />
-        </View>
-
-        {/* Contact Information Card */}
-        <View className="bg-white mx-4 mb-4 rounded-2xl p-4 shadow-sm">
-          <Text className="text-[17px] font-bold text-gray-900 mb-4">
-            Contact Information
-          </Text>
-
-          <ProfileField
-            icon={<MapPin size={20} color="#8B2635" />}
-            label="Address"
-            value={profile.address}
-            onEdit={() => openEditModal("Address", profile.address, true)}
-          />
-          <View className="h-px bg-gray-100 ml-12" />
-
-          <ProfileField
-            icon={<Phone size={20} color="#8B2635" />}
-            label="Phone"
-            value={profile.phone}
-            onEdit={() =>
-              openEditModal("Phone", profile.phone, false, "phone-pad")
-            }
-          />
-          <View className="h-px bg-gray-100 ml-12" />
-
-          <ProfileField
-            icon={<Mail size={20} color="#8B2635" />}
-            label="Email"
-            value={profile.email}
-            onEdit={() =>
-              openEditModal("Email", profile.email, false, "email-address")
-            }
-          />
-          <View className="h-px bg-gray-100 ml-12" />
-
-          <ProfileField
-            icon={<Globe size={20} color="#8B2635" />}
-            label="Website"
-            value={profile.website}
-            onEdit={() =>
-              openEditModal("Website", profile.website, false, "url")
-            }
-          />
-        </View>
-
-        {/* Account Settings */}
-        <View className="mx-4 mb-4">
-          <Text className="text-[17px] font-bold text-gray-900 mb-3">
-            Settings
-          </Text>
-
-          <SettingsItem
-            icon={<Bell size={20} color="#8B2635" />}
-            label="Push Notifications"
-            hasToggle
-            toggleValue={notificationsEnabled}
-            onToggle={setNotificationsEnabled}
-          />
-
-          <SettingsItem
-            icon={<Mail size={20} color="#8B2635" />}
-            label="Email Notifications"
-            hasToggle
-            toggleValue={emailNotifications}
-            onToggle={setEmailNotifications}
-          />
-
-          <SettingsItem
-            icon={<Lock size={20} color="#8B2635" />}
-            label="Privacy Settings"
+          <MenuDivider />
+          <MenuItem
+            title="Privacy Settings"
+            subtitle="Manage your privacy"
+            icon={Lock}
             onPress={() => {}}
           />
+        </MenuSection>
 
-          <SettingsItem
-            icon={<Info size={20} color="#8B2635" />}
-            label="About"
+        {/* Support Section */}
+        <MenuSection title="Support">
+          <MenuItem
+            title="Help & Support"
+            subtitle="FAQs, contact us"
+            icon={CircleHelp}
             onPress={() => {}}
           />
-
-          <SettingsItem
-            icon={<HelpCircle size={20} color="#8B2635" />}
-            label="Help & Support"
+          <MenuDivider />
+          <MenuItem
+            title="About CGUConnect"
+            subtitle="Version 1.0.0"
+            icon={Info}
             onPress={() => {}}
           />
-        </View>
+        </MenuSection>
 
-        {/* Logout Button */}
-        <TouchableOpacity
-          className="flex-row items-center justify-center gap-2 mx-4 py-4 rounded-xl bg-white border"
-          style={{ borderColor: "#E53935" }}
-          onPress={() => setShowLogoutModal(true)}
-        >
-          <LogOut size={20} color="#E53935" />
-          <Text
-            className="text-base font-semibold"
-            style={{ color: "#E53935" }}
-          >
-            Log Out
-          </Text>
-        </TouchableOpacity>
-
-        <View className="h-5" />
+        {/* Logout */}
+        <MenuSection>
+          <MenuItem
+            title="Logout"
+            icon={LogOut}
+            onPress={handleLogout}
+            destructive
+            showChevron={false}
+          />
+        </MenuSection>
       </ScrollView>
+    </>
+  );
+
+  return (
+    <View className="flex-1 bg-gray-50">
+      {/* Sub-page Header - only show when in a sub-screen */}
+      {activeScreen !== "main" && (
+        <SafeAreaView edges={["top"]} className="bg-white">
+          <View className="px-4 py-3 border-b border-gray-100">
+            <View className="flex-row items-center">
+              <Pressable
+                onPress={handleBack}
+                className="w-10 h-10 items-center justify-center -ml-2"
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <ChevronLeft size={28} color="#333" />
+              </Pressable>
+              <Text className="text-xl font-bold text-gray-900 ml-2">
+                {getScreenTitle()}
+              </Text>
+            </View>
+          </View>
+        </SafeAreaView>
+      )}
+
+      {/* Screen Content */}
+      {renderScreen()}
 
       {/* Edit Modal */}
       <EditModal
@@ -467,62 +579,6 @@ export default function EmployerSettingsScreen() {
         multiline={editModal.multiline}
         keyboardType={editModal.keyboardType}
       />
-
-      {/* Logout Confirmation Modal */}
-      <Modal
-        visible={showLogoutModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowLogoutModal(false)}
-      >
-        <View
-          className="flex-1 justify-center items-center p-6"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-        >
-          <View className="bg-white rounded-2xl p-6 w-full max-w-[320px] items-center">
-            <TouchableOpacity
-              className="absolute top-4 right-4 p-1"
-              onPress={() => setShowLogoutModal(false)}
-            >
-              <X size={20} color="#666" />
-            </TouchableOpacity>
-
-            <View
-              className="w-16 h-16 rounded-full justify-center items-center mb-4"
-              style={{ backgroundColor: "rgba(229, 57, 53, 0.1)" }}
-            >
-              <LogOut size={32} color="#E53935" />
-            </View>
-
-            <Text className="text-xl font-bold text-gray-900 mb-2">
-              Log Out?
-            </Text>
-            <Text className="text-sm text-gray-500 text-center mb-6 leading-5">
-              Are you sure you want to log out of your company account?
-            </Text>
-
-            <View className="flex-row gap-3 w-full">
-              <TouchableOpacity
-                className="flex-1 py-3.5 rounded-xl bg-gray-100 items-center"
-                onPress={() => setShowLogoutModal(false)}
-              >
-                <Text className="text-[15px] font-semibold text-gray-500">
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                className="flex-1 py-3.5 rounded-xl items-center"
-                style={{ backgroundColor: "#E53935" }}
-                onPress={handleLogout}
-              >
-                <Text className="text-[15px] font-semibold text-white">
-                  Log Out
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }

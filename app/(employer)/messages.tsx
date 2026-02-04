@@ -1,12 +1,10 @@
-import { LinearGradient } from "expo-linear-gradient";
-import {
-    ArrowLeft,
-    Check,
-    CheckCheck,
-    PenSquare,
-    Search,
-} from "lucide-react-native";
-import React, { useState } from "react";
+import ChatScreen from "@/components/jobSeeker/chat-screen";
+import NewMessageScreen, {
+    Contact,
+} from "@/components/jobSeeker/new-message-screen";
+import { useNavigationVisibility } from "@/hooks/use-navigation-visibility";
+import { Check, CheckCheck, PenSquare, Search } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
 import {
     Image,
     ScrollView,
@@ -16,7 +14,6 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 // Conversation data type
 interface Conversation {
@@ -171,6 +168,18 @@ const ConversationItem = ({ conversation, onPress }: ConversationItemProps) => (
 export default function EmployerMessagesScreen() {
   const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedConversation, setSelectedConversation] = useState<
+    string | null
+  >(null);
+  const [showNewMessage, setShowNewMessage] = useState(false);
+  const [newConversationUser, setNewConversationUser] =
+    useState<Contact | null>(null);
+  const { setNavigationVisible } = useNavigationVisibility();
+
+  // Hide navigation when viewing chat screen or new message screen
+  useEffect(() => {
+    setNavigationVisible(selectedConversation === null && !showNewMessage);
+  }, [selectedConversation, showNewMessage, setNavigationVisible]);
 
   const filteredConversations = conversations.filter((conv) => {
     const matchesSearch = conv.user.name
@@ -180,42 +189,113 @@ export default function EmployerMessagesScreen() {
     return matchesSearch && matchesTab;
   });
 
+  const handleConversationPress = (conversationId: string) => {
+    setSelectedConversation(conversationId);
+  };
+
+  const handleBackFromChat = () => {
+    setSelectedConversation(null);
+    setNewConversationUser(null);
+  };
+
+  const handleCreateNewMessage = () => {
+    setShowNewMessage(true);
+  };
+
+  const handleSelectContact = (contact: Contact) => {
+    setNewConversationUser(contact);
+    setShowNewMessage(false);
+    setSelectedConversation(contact.id);
+  };
+
+  const handleBackFromNewMessage = () => {
+    setShowNewMessage(false);
+  };
+
+  // Show new message screen if user wants to create a new message
+  if (showNewMessage) {
+    return (
+      <NewMessageScreen
+        onBack={handleBackFromNewMessage}
+        onSelectContact={handleSelectContact}
+      />
+    );
+  }
+
+  // Show chat screen if a conversation is selected
+  if (selectedConversation) {
+    return (
+      <ChatScreen
+        conversationId={selectedConversation}
+        onBack={handleBackFromChat}
+        newUser={newConversationUser}
+      />
+    );
+  }
+
   return (
-    <View className="flex-1 bg-gray-100">
+    <View className="flex-1 bg-gray-50">
       <StatusBar barStyle="light-content" backgroundColor="#8B2635" />
 
-      {/* Header with Gradient */}
-      <LinearGradient
-        colors={["#8B2635", "#7D1F2E", "#6B1A27"]}
-        className="pb-4"
-      >
-        <SafeAreaView edges={["top"]} className="px-4">
-          {/* Top Row */}
-          <View className="flex-row justify-between items-center pt-2 pb-3">
-            <TouchableOpacity className="p-2 -ml-2">
-              <ArrowLeft size={24} color="#fff" />
-            </TouchableOpacity>
-            <Text className="text-xl font-bold text-white">Messages</Text>
-            <TouchableOpacity className="p-2">
-              <PenSquare size={22} color="#fff" />
-            </TouchableOpacity>
-          </View>
+      {/* Page Header */}
+      <View className="bg-white px-4 py-3 border-b border-gray-100">
+        <View className="flex-row justify-between items-center mb-3">
+          <Text className="text-2xl font-bold text-gray-900">Messages</Text>
+          <TouchableOpacity
+            className="w-10 h-10 rounded-full items-center justify-center"
+            style={{ backgroundColor: "rgba(139, 38, 53, 0.1)" }}
+            onPress={handleCreateNewMessage}
+          >
+            <PenSquare size={20} color="#8B2635" />
+          </TouchableOpacity>
+        </View>
 
-          {/* Search Bar */}
-          <View className="mt-1">
-            <View className="flex-row items-center bg-white rounded-xl px-3.5 py-3 gap-2.5">
-              <Search size={20} color="#999" />
-              <TextInput
-                className="flex-1 text-base text-gray-800"
-                placeholder="Search candidates..."
-                placeholderTextColor="#999"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </View>
-          </View>
-        </SafeAreaView>
-      </LinearGradient>
+        {/* Search Bar */}
+        <View className="flex-row items-center bg-gray-100 rounded-xl px-3.5 py-3 gap-2.5">
+          <Search size={20} color="#999" />
+          <TextInput
+            className="flex-1 text-base text-gray-800"
+            placeholder="Search candidates..."
+            placeholderTextColor="#999"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+      </View>
+
+      {/* Online Users Section */}
+      <View className="bg-white py-3 border-b border-gray-100">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 12 }}
+        >
+          {conversations
+            .filter((conv) => conv.user.isOnline)
+            .map((conv) => (
+              <TouchableOpacity
+                key={conv.id}
+                className="items-center mx-2"
+                onPress={() => handleConversationPress(conv.id)}
+              >
+                <View className="relative">
+                  <Image
+                    source={{ uri: conv.user.avatar }}
+                    className="w-16 h-16 rounded-full border-2 border-gray-100"
+                  />
+                  <View className="absolute bottom-0.5 right-0.5 w-4 h-4 rounded-full bg-green-500 border-[3px] border-white" />
+                </View>
+                <Text
+                  className="text-xs text-gray-700 mt-1.5 text-center font-medium"
+                  numberOfLines={1}
+                  style={{ maxWidth: 70 }}
+                >
+                  {conv.user.name.split(" ")[0]}
+                </Text>
+              </TouchableOpacity>
+            ))}
+        </ScrollView>
+      </View>
 
       {/* Tabs */}
       <View className="flex-row bg-white px-4 py-1 border-b border-gray-200">
@@ -262,7 +342,7 @@ export default function EmployerMessagesScreen() {
           <ConversationItem
             key={conversation.id}
             conversation={conversation}
-            onPress={() => {}}
+            onPress={() => handleConversationPress(conversation.id)}
           />
         ))}
 

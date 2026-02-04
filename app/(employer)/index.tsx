@@ -1,28 +1,33 @@
-import { LinearGradient } from "expo-linear-gradient";
+import { JobFormModal, SuccessModal } from "@/components/employer";
+import {
+    EmployerJobFormData,
+    emptyJobTemplate
+} from "@/components/employer/types";
+import { mockEmployer } from "@/data/mock-employer";
+import { mockEmployerJobs } from "@/data/mock-employer-jobs";
 import { useRouter } from "expo-router";
 import {
-  Briefcase,
-  CheckCircle,
-  ChevronRight,
-  Clock,
-  Eye,
-  Plus,
-  Search,
-  TrendingUp,
-  Users
+    Briefcase,
+    CheckCircle,
+    ChevronRight,
+    Clock,
+    Eye,
+    Plus,
+    Search,
+    TrendingUp,
+    Users,
 } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
-  Dimensions,
-  Image,
-  ScrollView,
-  StatusBar,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Dimensions,
+    Image,
+    ScrollView,
+    StatusBar,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 48 - 12) / 2;
@@ -35,33 +40,15 @@ const quickActions = [
   { id: "4", name: "Analytics", icon: TrendingUp, color: "#FF9800" },
 ];
 
-// Recent Job Posts
-const recentJobPosts = [
-  {
-    id: "1",
-    title: "Software Engineer",
-    applicants: 24,
-    views: 156,
-    status: "active",
-    postedDate: "2 days ago",
-  },
-  {
-    id: "2",
-    title: "UI/UX Designer",
-    applicants: 18,
-    views: 98,
-    status: "active",
-    postedDate: "5 days ago",
-  },
-  {
-    id: "3",
-    title: "Project Manager",
-    applicants: 12,
-    views: 67,
-    status: "closed",
-    postedDate: "1 week ago",
-  },
-];
+// Recent Job Posts - use actual mock data
+const recentJobPosts = mockEmployerJobs.slice(0, 3).map((job) => ({
+  id: job.id,
+  title: job.title,
+  applicants: job.applicants,
+  views: job.views,
+  status: job.status,
+  postedDate: job.postedDate,
+}));
 
 // Top Applicants
 const topApplicants = [
@@ -134,7 +121,7 @@ interface JobPostCardProps {
 
 const JobPostCard = ({ job, onPress }: JobPostCardProps) => (
   <TouchableOpacity
-    className="bg-white rounded-2xl p-4 mb-3 shadow-sm"
+    className="bg-white rounded-2xl p-4 mb-3 shadow-sm border border-gray-100"
     onPress={onPress}
     activeOpacity={0.8}
   >
@@ -181,7 +168,7 @@ interface ApplicantCardProps {
 
 const ApplicantCard = ({ applicant, onPress }: ApplicantCardProps) => (
   <TouchableOpacity
-    className="bg-white rounded-2xl p-4 mr-3 shadow-sm items-center"
+    className="bg-white rounded-2xl p-4 mr-3 shadow-sm items-center border border-gray-100"
     style={{ width: 140 }}
     onPress={onPress}
     activeOpacity={0.8}
@@ -214,54 +201,85 @@ const ApplicantCard = ({ applicant, onPress }: ApplicantCardProps) => (
 export default function EmployerHomeScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [showPostJobModal, setShowPostJobModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [newJob, setNewJob] = useState<EmployerJobFormData>(emptyJobTemplate);
 
   const handleQuickAction = (actionId: string) => {
     switch (actionId) {
       case "1":
-        // Navigate to post job
+        // Open Post Job modal
+        setNewJob(emptyJobTemplate);
+        setShowPostJobModal(true);
         break;
       case "2":
         // Navigate to view applicants
+        router.push("/(employer)/applicants" as any);
         break;
       case "3":
         router.push("/(employer)/jobs" as any);
         break;
       case "4":
         // Navigate to analytics
+        router.push("/(employer)/analytics" as any);
         break;
     }
   };
 
+  const handleJobPress = (jobId: string) => {
+    // Navigate to jobs page with job selected
+    router.push("/(employer)/jobs" as any);
+  };
+
+  const handleApplicantPress = (applicantId: string) => {
+    // Navigate to applicants page
+    router.push("/(employer)/applicants" as any);
+  };
+
+  const handleViewAllApplicants = () => {
+    router.push("/(employer)/applicants" as any);
+  };
+
+  const handleSaveJob = useCallback((jobData: EmployerJobFormData) => {
+    // In a real app, this would save to the backend
+    console.log("New job posted:", jobData);
+    setShowPostJobModal(false);
+    setSuccessMessage(`"${jobData.title}" has been posted successfully!`);
+    setShowSuccessModal(true);
+  }, []);
+
+  // Calculate stats from mock data
+  const activeJobsCount = mockEmployerJobs.filter(
+    (j) => j.status === "active",
+  ).length;
+  const totalApplicants = mockEmployerJobs.reduce(
+    (sum, j) => sum + j.applicants,
+    0,
+  );
+  const interviewsCount = 8; // Mock value
+
   return (
-    <View className="flex-1 bg-gray-100">
+    <View className="flex-1 bg-gray-50">
       <StatusBar barStyle="light-content" backgroundColor="#8B2635" />
 
-      {/* Header with Gradient */}
-      <LinearGradient
-        colors={["#8B2635", "#7D1F2E", "#6B1A27"]}
-        className="pb-5"
-      >
-        <SafeAreaView edges={["top"]} className="px-4">
-
-          {/* Welcome Card */}
-          <View className="flex-row items-center bg-white rounded-2xl p-4 shadow-lg">
-            <Image
-              source={{
-                uri: "https://api.dicebear.com/7.x/initials/png?seed=COMP&backgroundColor=8B2635",
-              }}
-              className="w-14 h-14 rounded-xl mr-3.5"
-            />
-            <View className="flex-1">
-              <Text className="text-lg font-semibold text-gray-900 mb-1">
-                Welcome, Company Name
-              </Text>
-              <Text className="text-sm text-gray-500">
-                Find the best talent for your team!
-              </Text>
-            </View>
+      {/* Welcome Card */}
+      <View className="bg-white px-4 py-4 border-b border-gray-100">
+        <View className="flex-row items-center">
+          <Image
+            source={{ uri: mockEmployer.logo }}
+            className="w-14 h-14 rounded-xl mr-3.5"
+          />
+          <View className="flex-1">
+            <Text className="text-lg font-semibold text-gray-900 mb-1">
+              Welcome, {mockEmployer.companyName}
+            </Text>
+            <Text className="text-sm text-gray-500">
+              Find the best talent for your team!
+            </Text>
           </View>
-        </SafeAreaView>
-      </LinearGradient>
+        </View>
+      </View>
 
       <ScrollView
         className="flex-1"
@@ -300,29 +318,38 @@ export default function EmployerHomeScreen() {
         </View>
 
         {/* Stats Overview */}
-        <View className="bg-white rounded-2xl p-4 mb-6 shadow-sm">
+        <View className="bg-white rounded-2xl p-4 mb-6 shadow-sm border border-gray-100">
           <Text className="text-lg font-bold text-gray-900 mb-4">Overview</Text>
           <View className="flex-row justify-between">
-            <View className="items-center flex-1">
+            <TouchableOpacity
+              className="items-center flex-1"
+              onPress={() => router.push("/(employer)/jobs" as any)}
+            >
               <Text className="text-2xl font-bold" style={{ color: "#8B2635" }}>
-                12
+                {activeJobsCount}
               </Text>
               <Text className="text-xs text-gray-500 mt-1">Active Jobs</Text>
-            </View>
+            </TouchableOpacity>
             <View className="w-px bg-gray-200" />
-            <View className="items-center flex-1">
+            <TouchableOpacity
+              className="items-center flex-1"
+              onPress={() => router.push("/(employer)/applicants" as any)}
+            >
               <Text className="text-2xl font-bold" style={{ color: "#2196F3" }}>
-                54
+                {totalApplicants}
               </Text>
               <Text className="text-xs text-gray-500 mt-1">Applicants</Text>
-            </View>
+            </TouchableOpacity>
             <View className="w-px bg-gray-200" />
-            <View className="items-center flex-1">
+            <TouchableOpacity
+              className="items-center flex-1"
+              onPress={() => router.push("/(employer)/applicants" as any)}
+            >
               <Text className="text-2xl font-bold" style={{ color: "#4CAF50" }}>
-                8
+                {interviewsCount}
               </Text>
               <Text className="text-xs text-gray-500 mt-1">Interviews</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -332,7 +359,10 @@ export default function EmployerHomeScreen() {
             <Text className="text-xl font-bold text-gray-900">
               Top Applicants
             </Text>
-            <TouchableOpacity className="flex-row items-center gap-1">
+            <TouchableOpacity
+              className="flex-row items-center gap-1"
+              onPress={handleViewAllApplicants}
+            >
               <Text className="text-sm text-gray-500 font-medium">
                 View all
               </Text>
@@ -349,7 +379,7 @@ export default function EmployerHomeScreen() {
               <ApplicantCard
                 key={applicant.id}
                 applicant={applicant}
-                onPress={() => {}}
+                onPress={() => handleApplicantPress(applicant.id)}
               />
             ))}
           </ScrollView>
@@ -373,12 +403,33 @@ export default function EmployerHomeScreen() {
           </View>
 
           {recentJobPosts.map((job) => (
-            <JobPostCard key={job.id} job={job} onPress={() => {}} />
+            <JobPostCard
+              key={job.id}
+              job={job}
+              onPress={() => handleJobPress(job.id)}
+            />
           ))}
         </View>
 
         <View className="h-5" />
       </ScrollView>
+
+      {/* Post Job Modal */}
+      <JobFormModal
+        visible={showPostJobModal}
+        isEditMode={false}
+        formData={newJob}
+        onFormChange={setNewJob}
+        onClose={() => setShowPostJobModal(false)}
+        onSave={() => handleSaveJob(newJob)}
+      />
+
+      {/* Success Modal */}
+      <SuccessModal
+        visible={showSuccessModal}
+        message={successMessage}
+        onClose={() => setShowSuccessModal(false)}
+      />
     </View>
   );
 }

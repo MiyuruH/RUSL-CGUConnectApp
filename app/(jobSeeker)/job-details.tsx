@@ -1,30 +1,30 @@
 import { JobDetailsHeader } from "@/components/jobSeeker/job-details-header";
 import {
-  BulletList,
-  JobSection,
-  Paragraph,
+    BulletList,
+    JobSection,
+    Paragraph,
 } from "@/components/jobSeeker/job-section";
 import { mockJobs } from "@/data/mock-jobs";
 import type { Job } from "@/types/job";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  AlertCircle,
-  BookOpen,
-  Briefcase,
-  Building2,
-  CheckCircle,
-  ClipboardList,
+    AlertCircle,
+    BookOpen,
+    Briefcase,
+    Building2,
+    CheckCircle,
+    ClipboardList,
 } from "lucide-react-native";
 import React, { useCallback, useState } from "react";
 import {
-  ActivityIndicator,
-  Modal,
-  Pressable,
-  ScrollView,
-  Share,
-  Text,
-  View,
+    ActivityIndicator,
+    Modal,
+    Pressable,
+    ScrollView,
+    Share,
+    Text,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -39,7 +39,11 @@ export default function JobDetailsScreen() {
 
   // Handle back navigation
   const handleBack = useCallback(() => {
-    router.back();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(jobSeeker)/jobs");
+    }
   }, [router]);
 
   // Handle share
